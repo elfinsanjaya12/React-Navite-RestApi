@@ -1,5 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Image } from 'react-native';
+import axios from 'axios'
+
 
 export default class App extends React.Component {
   static navigationOptions = {
@@ -10,6 +12,7 @@ export default class App extends React.Component {
     this.state = {
       hasil: 0,
       input: '',
+      yesno: '',
       showAbout: false
     }
   }
@@ -79,22 +82,14 @@ export default class App extends React.Component {
     return hasil;
   }
 
-  render() {
-    const { showAbout } = this.state
-    const arrayOperator = [{
-      nama : 'tambah',
-      operator : '+'
-    },{
-      nama : 'Kurang',
-      operator : '-'
-    },{
-      nama : 'Bagi',
-      operator : '/'
-    },{
-      nama : 'Kali',
-      operator : '*'
-    }];
+componentDidMount(){
+  axios.get('https://yesno.wtf/api').then((res) => this.setState({yesno: res.data})).catch(err => console.log(err))
+}
 
+
+  render() {
+    const { showAbout, yesno } = this.state
+  
     return (
       <View style={styles.container}>
         <Text style={{fontSize: 32}}>Kalkulator</Text>
@@ -103,23 +98,9 @@ export default class App extends React.Component {
           value={this.state.input} 
           onChangeText={(val) => this.input(val)} 
         />
-        {
-          arrayOperator.map(data => {
-            return (
-              <Button title={data.nama} onPress={() => {
-                  const {input} = this.state
-                  const inputBaru = `${input}${data.operator}`
-                  this.setState({input: inputBaru})
-               }}
-              />
-            )
-          })
-        }
-
-        <Button 
-          title="Go to About Screen" 
-          onPress={() => this.props.navigation.navigate('About', {text: 'ini adalah data dari pararms'})}
-        />
+        <Text style={ {fontSize: 25} }>Hasil : {this.state.hasil}</Text>
+        <Image source={{uri: yesno.image}} style={{width: 100, height:100}} />
+        <Text style={ {fontSize: 25} }>{yesno.answer}</Text>
       </View>
     );
   }
